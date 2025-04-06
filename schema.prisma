@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // or your DB of choice
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Guest
+  Student
+  Lecturer
+  Staff
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  username String    @unique
+  password String
+  email    String    @unique
+  role     Role      // Enum instead of integer
+  bookings Booking[] // m-n relation with Room through Booking
+}
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  longitude   Float
+  latitude    Float
+  bookings    Booking[] // m-n relation with User through Booking
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  room        Room     @relation(fields: [roomId], references: [id])
+  roomId      Int
+  date        DateTime
+  schedule    Int      // Bitmap to represent time slots
+
+  @@unique([userId, roomId, date, schedule]) // Optional: prevent duplicate bookings
+}

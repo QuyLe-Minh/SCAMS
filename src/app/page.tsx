@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { prisma } from "@/config/prisma_client";
+import { Role } from "@prisma/client";
 
 export default function Home() {
   return (
