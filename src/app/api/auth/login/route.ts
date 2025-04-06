@@ -42,7 +42,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { expiresIn: '6h' }
     );
 
-    const response = NextResponse.json({token: token, success: true, resultCode: 0 , message: 'Login successful' });
+    const response = NextResponse.json({username: user.username, role: user.role, token: token, success: true, resultCode: 0 , message: 'Login successful' });
 
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,
