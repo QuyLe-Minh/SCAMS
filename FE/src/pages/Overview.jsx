@@ -77,8 +77,4 @@ function Overview() {
   );
 }
 
-<<<<<<< HEAD
 export default Overview;
-=======
-export default Overview;
->>>>>>> remotes/origin/feat/room-booking
