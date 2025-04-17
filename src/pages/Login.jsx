@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { handleSignup } from './Signup'; // Adjust the path as needed
 
 function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('guest'); // Default role
   const [error, setError] = useState('');
   const [triggerBuzzle, setTriggerBuzzle] = useState(false); // State to toggle the buzzle class
+  const [isSigningUp, setIsSigningUp] = useState(false); // State to toggle between login and signup
 
   const handleLogin = async () => {
     try {
@@ -40,7 +43,7 @@ function Login() {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      handleLogin(); // Trigger login on Enter key press
+      isSigningUp ? handleSignup(email, password, role, setError, setIsSigningUp, triggerBuzzleEffect) : handleLogin(); // Trigger login or signup on Enter key press
     }
   };
 
@@ -50,8 +53,12 @@ function Login() {
         <div className="text-center mb-6">
           <img src="/logo.png" alt="Logo" className="mx-auto w-12 h-12" />
           <p className="text-gray-400">SCAMS</p>
-          <h2 className="text-xl font-semibold">Log In</h2>
-          <p className="text-sm text-gray-500">Enter your email and password below</p>
+          <h2 className="text-xl font-semibold">{isSigningUp ? 'Sign Up' : 'Log In'}</h2>
+          <p className="text-sm text-gray-500">
+            {isSigningUp
+              ? 'Enter your email, password, and select a role below'
+              : 'Enter your email and password below'}
+          </p>
         </div>
         {error && (
           <p
@@ -67,7 +74,7 @@ function Login() {
           placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger login on Enter key press
+          onKeyDown={handleKeyDown} // Trigger login or signup on Enter key press
           className="w-full mb-3 px-4 py-2 border rounded"
         />
         <input
@@ -75,16 +82,59 @@ function Login() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger login on Enter key press
+          onKeyDown={handleKeyDown} // Trigger login or signup on Enter key press
           className="w-full mb-3 px-4 py-2 border rounded"
         />
-        <div className="text-right text-xs text-blue-600 cursor-pointer mb-3">Forgot password?</div>
-        <button
-          onClick={handleLogin}
-          className="w-full bg-blue-400 text-white py-2 rounded hover:bg-blue-700 transition-colors"
-        >
-          Log In
-        </button>
+        {isSigningUp && (
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Select Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full px-4 py-2 border rounded"
+            >
+              <option value="lecturer">Lecturer</option>
+              <option value="guest">Guest</option>
+              <option value="staff">Staff</option>
+            </select>
+          </div>
+        )}
+        <div className="text-right text-xs text-blue-600 cursor-pointer mb-3">
+          Forgot password?
+        </div>
+        {!isSigningUp ? (
+          <>
+            <button
+              onClick={handleLogin}
+              className="w-full bg-blue-400 text-white py-2 rounded hover:bg-blue-700 transition-colors mb-3"
+            >
+              Log In
+            </button>
+            <button
+              onClick={() => setIsSigningUp(true)} // Switch to sign-up mode
+              className="w-full bg-green-400 text-white py-2 rounded hover:bg-green-700 transition-colors"
+            >
+              Sign Up
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => handleSignup(email, password, role, setError, setIsSigningUp, triggerBuzzleEffect)}
+              className="w-full bg-green-400 text-white py-2 rounded hover:bg-green-700 transition-colors mb-3"
+            >
+              Sign Up
+            </button>
+            <button
+              onClick={() => setIsSigningUp(false)} // Switch back to login mode
+              className="w-full bg-gray-400 text-white py-2 rounded hover:bg-gray-700 transition-colors"
+            >
+              Back to Log In
+            </button>
+          </>
+        )}
         <div className="text-center mt-4 text-sm">
           Or sign in as{' '}
           <span
