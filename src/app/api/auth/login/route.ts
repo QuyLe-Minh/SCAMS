@@ -2,6 +2,7 @@ import { prisma } from '@/config/prisma_client';
 // import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
+import 'dotenv/config';
 import {
   getEmailFromToken,
   getIdFromToken,
