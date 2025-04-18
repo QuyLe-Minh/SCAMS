@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth" 
+import { getIdFromToken, verifyToken } from "@/lib/auth" 
 import { prisma } from "@/config/prisma_client"
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization")
+  console.log(authHeader)
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json(
@@ -17,9 +18,9 @@ export async function GET(req: Request) {
   }
 
   const token = authHeader.split(" ")[1]
-  const decoded = verifyToken(token)
+  const userId = getIdFromToken(token)
 
-  if (!decoded) {
+  if (!userId) {
     NextResponse.json(
       {
         success: false,
@@ -33,8 +34,17 @@ export async function GET(req: Request) {
   try{
     const bookings = await prisma.booking.findMany({
         where: {
-            userId: decoded?.id
-        }
+          userId: userId
+        },
+        select: {
+          roomId: true,
+          date: true,
+          schedule: true,
+        },
+        orderBy: [
+          {roomId: `asc`},
+          {date: 'asc'},
+      ],
     });
     return NextResponse.json({
       success: true,
@@ -53,7 +63,4 @@ export async function GET(req: Request) {
       { status: 500 }
     )
   }
-  
-
-  
 }
