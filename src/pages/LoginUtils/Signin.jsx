@@ -12,7 +12,7 @@ export const handleLogin = async (email, password, setError, triggerBuzzleEffect
       // Treat resultCode 4 (Already logged in) as a successful login
       navigate('/overview');
     } else if (data.resultCode === 5) {
-      setError('Different account detected. Please try logging in again.');
+      setError('Invalid username/email or password');
       triggerBuzzleEffect();
     } else {
       setError(data.message); // Set error message
