@@ -1,38 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { handleSignup } from './Signup'; // Adjust the path as needed
+import { handleSignup } from './LoginUtils/Signup'; // Adjust the path as needed
+import { handleLogin } from './LoginUtils/Signin'; // Adjust the path as needed
 
 function Login() {
   const navigate = useNavigate();
+  const [username, setUsername] = useState(''); // New state for username
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('guest'); // Default role
+  const [role, setRole] = useState('Guest'); // Default role
   const [error, setError] = useState('');
   const [triggerBuzzle, setTriggerBuzzle] = useState(false); // State to toggle the buzzle class
   const [isSigningUp, setIsSigningUp] = useState(false); // State to toggle between login and signup
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: email, password }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        navigate('/overview'); // Redirect to the overview page
-      } else {
-        setError(data.message); // Show error message
-        triggerBuzzleEffect(); // Trigger the buzzle animation
-      }
-    } catch (err) {
-      console.error('Login failed:', err);
-      setError('Invalid email or password');
-      triggerBuzzleEffect(); // Trigger the buzzle animation
-    }
-  };
 
   const triggerBuzzleEffect = () => {
     setTriggerBuzzle(false); // Remove the class
@@ -43,7 +22,9 @@ function Login() {
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      isSigningUp ? handleSignup(email, password, role, setError, setIsSigningUp, triggerBuzzleEffect) : handleLogin(); // Trigger login or signup on Enter key press
+      isSigningUp
+        ? handleSignup(username, email, password, role, setError, setIsSigningUp, triggerBuzzleEffect)
+        : handleLogin(); // Trigger login or signup on Enter key press
     }
   };
 
@@ -56,7 +37,7 @@ function Login() {
           <h2 className="text-xl font-semibold">{isSigningUp ? 'Sign Up' : 'Log In'}</h2>
           <p className="text-sm text-gray-500">
             {isSigningUp
-              ? 'Enter your email, password, and select a role below'
+              ? 'Register using your email and password below'
               : 'Enter your email and password below'}
           </p>
         </div>
@@ -69,12 +50,22 @@ function Login() {
             {error}
           </p>
         )}
+        {isSigningUp && (
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="w-full mb-3 px-4 py-2 border rounded"
+          />
+        )}
         <input
           type="email"
           placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger login or signup on Enter key press
+          onKeyDown={handleKeyDown}
           className="w-full mb-3 px-4 py-2 border rounded"
         />
         <input
@@ -82,7 +73,7 @@ function Login() {
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={handleKeyDown} // Trigger login or signup on Enter key press
+          onKeyDown={handleKeyDown}
           className="w-full mb-3 px-4 py-2 border rounded"
         />
         {isSigningUp && (
@@ -95,9 +86,10 @@ function Login() {
               onChange={(e) => setRole(e.target.value)}
               className="w-full px-4 py-2 border rounded"
             >
-              <option value="lecturer">Lecturer</option>
-              <option value="guest">Guest</option>
-              <option value="staff">Staff</option>
+              <option value="Lecturer">Lecturer</option>
+              <option value="Guest">Guest</option>
+              <option value="Staff">Staff</option>
+              <option value="Student">Staff</option>
             </select>
           </div>
         )}
@@ -122,7 +114,9 @@ function Login() {
         ) : (
           <>
             <button
-              onClick={() => handleSignup(email, password, role, setError, setIsSigningUp, triggerBuzzleEffect)}
+              onClick={() =>
+                handleSignup(username, email, password, role, setError, setIsSigningUp, triggerBuzzleEffect)
+              }
               className="w-full bg-green-400 text-white py-2 rounded hover:bg-green-700 transition-colors mb-3"
             >
               Sign Up

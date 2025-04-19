@@ -20,13 +20,20 @@ export async function POST(req: NextRequest, res: NextResponse) {
       return NextResponse.json({success: false, resultCode: 4, message: 'Already logged in' }, { status: 403 });
     }
 
-    const { username, password } = await req.json();
+    const { usernameOrEmail, password } = await req.json();
 
-    if (!username || !password) {
-      return NextResponse.json({success: false, resultCode: 3, message: 'Username and password are required' }, { status: 400 });
+    if (!usernameOrEmail || !password) {
+      return NextResponse.json({ success: false, resultCode: 3, message: 'Username/Email and password are required' }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({ where: { username } });
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: usernameOrEmail },
+          { email: usernameOrEmail },
+        ],
+      },
+    });
 
     if (!user || password != user.password) {
       return NextResponse.json({success: false, resultCode: 2, message: 'Invalid username or password' }, { status: 401 });
