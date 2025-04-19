@@ -1,28 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { handleSignOut } from './LoginUtils/Signout'; // Adjust the path as needed
 
 function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'GET',
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        alert(data.message); // Optional: Show a success message
-        navigate('/'); // Redirect to the login page
-      } else {
-        console.error('Logout failed:', data.message);
-      }
-    } catch (err) {
-      console.error('Error during logout:', err);
-    }
-  };
 
   return (
     <div
@@ -34,7 +16,10 @@ function Sidebar() {
       {isSidebarOpen && (
         <div>
           {/* Top Section */}
-          <div className="flex flex-col items-center justify-center p-4">
+          <div
+            className="flex flex-col items-center justify-center p-4 cursor-pointer"
+            onClick={() => navigate('/overview')} // Navigate to /overview when clicking the logo
+          >
             <img
               src="/logo.png"
               alt="Logo"
@@ -46,7 +31,10 @@ function Sidebar() {
             <li className="p-2 hover:bg-gray-700 cursor-pointer text-center">
               My Booking
             </li>
-            <li className="p-2 hover:bg-gray-700 cursor-pointer text-center">
+            <li
+              className="p-2 hover:bg-gray-700 cursor-pointer text-center"
+              onClick={() => navigate('/room-booking')} // Navigate to /room-booking
+            >
               Room Booking
             </li>
             <li className="p-2 hover:bg-gray-700 cursor-pointer text-center">
@@ -71,7 +59,7 @@ function Sidebar() {
             </li>
             <li
               className="p-2 hover:bg-gray-700 cursor-pointer text-center"
-              onClick={handleSignOut} // Call the logout API
+              onClick={() => handleSignOut(navigate)} // Call the modularized logout function
             >
               Sign Out
             </li>

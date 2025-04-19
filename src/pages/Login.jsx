@@ -24,7 +24,7 @@ function Login() {
     if (e.key === 'Enter') {
       isSigningUp
         ? handleSignup(username, email, password, role, setError, setIsSigningUp, triggerBuzzleEffect)
-        : handleLogin(); // Trigger login or signup on Enter key press
+        : handleLogin(email, password, setError, triggerBuzzleEffect, navigate); // Trigger login or signup on Enter key press
     }
   };
 
@@ -99,7 +99,7 @@ function Login() {
         {!isSigningUp ? (
           <>
             <button
-              onClick={handleLogin}
+              onClick={() => handleLogin(email, password, setError, triggerBuzzleEffect, navigate)}
               className="w-full bg-blue-400 text-white py-2 rounded hover:bg-blue-700 transition-colors mb-3"
             >
               Log In
