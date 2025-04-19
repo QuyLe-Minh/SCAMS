@@ -8,6 +8,7 @@ export const handleSignOut = async (navigate) => {
   
       if (data.success) {
         alert(data.message); // Optional: Show a success message
+        localStorage.setItem('isLoggedIn', 'false');
         navigate('/'); // Redirect to the login page
       } else {
         console.error('Logout failed:', data.message);

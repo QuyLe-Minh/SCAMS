@@ -9,8 +9,11 @@ export const handleLogin = async (email, password, setError, triggerBuzzleEffect
     const data = await response.json();
 
     if (data.success || data.resultCode === 4) {
-      // Treat resultCode 4 (Already logged in) as a successful login
+      localStorage.setItem('isLoggedIn', 'true');
       navigate('/overview');
+    } else if (data.resultCode === 5) {
+      setError('Invalid username/email or password');
+      triggerBuzzleEffect();
     } else {
       setError(data.message); // Set error message
       triggerBuzzleEffect(); // Trigger the buzzle effect
