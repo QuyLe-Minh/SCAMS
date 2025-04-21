@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getIdFromToken, verifyToken } from "@/lib/auth" 
+import { verifyToken } from "@/lib/auth" 
 import { prisma } from "@/config/prisma_client"
 
 export async function GET(req: Request) {
@@ -19,9 +19,9 @@ export async function GET(req: Request) {
 
 
   const token = authHeader.split(" ")[1]
-  const userId = getIdFromToken(token)
+  const decoded = verifyToken(token)
 
-  if (!userId) {
+  if (!decoded) {
     return NextResponse.json(
       {
         success: false,
@@ -38,11 +38,6 @@ export async function GET(req: Request) {
   const roomId = roomIdParam ? parseInt(roomIdParam) : -1
 
   try {
-
-
-
-
-
     const bookings = await prisma.booking.findMany({
       where: {
         roomId: roomId,
