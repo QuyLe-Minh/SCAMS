@@ -40,7 +40,15 @@ export async function POST(req: Request) {
     )
   }
 
-  const body: BookingRequest = await req.json()
+  let body: BookingRequest
+  try {
+    body = await req.json()
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, resultCode: 3, message: "Invalid request body" },
+      { status: 400 }
+    )
+  }
 
   const { roomName, date, schedule } = body
 
@@ -81,7 +89,7 @@ export async function POST(req: Request) {
       {
         success: false,
         resultCode: 4,
-        message: "Room is already booked",
+        message: "Conflict with existing booking.",
       },
       { status: 409 }
     )
