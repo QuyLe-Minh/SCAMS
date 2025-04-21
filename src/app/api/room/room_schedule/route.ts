@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth" 
+import { verifyToken } from "@/lib/auth"
 import { prisma } from "@/config/prisma_client"
 
 export async function GET(req: Request) {
@@ -16,11 +16,12 @@ export async function GET(req: Request) {
     )
   }
 
+
   const token = authHeader.split(" ")[1]
   const decoded = verifyToken(token)
 
   if (!decoded) {
-    NextResponse.json(
+    return NextResponse.json(
       {
         success: false,
         resultCode: 2,
@@ -30,19 +31,38 @@ export async function GET(req: Request) {
     )
   }
 
-  try{
+ 
+  const { searchParams } = new URL(req.url)
+  const roomIdParam = searchParams.get("roomId")
+  const roomId = roomIdParam ? parseInt(roomIdParam) : null
+
+  try {
+
+
+
+
+
     const bookings = await prisma.booking.findMany({
-        where: {
-            userId: decoded?.id
-        }
-    });
+      where: {
+        roomId: roomId,
+      },
+      select: {
+        id:true,
+        userId:true,
+        date:true,
+        schedule:true
+      },
+    })
+
     return NextResponse.json({
       success: true,
       resultCode: 0,
-      message: "All bookings retrieved successfully",
+      message: roomId
+        ? "Room bookings retrieved successfully"
+        : "All bookings retrieved successfully",
       data: bookings,
     })
-  }catch(error){
+  } catch (error) {
     console.error("Error fetching bookings:", error)
     return NextResponse.json(
       {
@@ -53,7 +73,4 @@ export async function GET(req: Request) {
       { status: 500 }
     )
   }
-  
-
-  
 }

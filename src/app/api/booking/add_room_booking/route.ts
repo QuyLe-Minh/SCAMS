@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth"
 import { prisma } from "@/config/prisma_client"
-import { Booking } from "@prisma/client/wasm"
+import { Booking } from "@prisma/client"
 
 interface BookingRequest {
-  roomName: number
+  roomName: string
   date: string
   schedule: [number, number]
 }
@@ -37,12 +37,20 @@ export async function POST(req: Request) {
     )
   }
 
-  const body: BookingRequest = await req.json()
+  let body: BookingRequest
+  try {
+    body = await req.json()
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, resultCode: 3, message: "Invalid request body" },
+      { status: 400 }
+    )
+  }
 
   const { roomName, date, schedule } = body
 
   if (
-    typeof roomName !== "number" ||
+    typeof roomName !== "string" || // Changed from number to string
     !Array.isArray(schedule) ||
     schedule.length !== 2 ||
     typeof schedule[0] !== "number" ||
@@ -54,42 +62,49 @@ export async function POST(req: Request) {
     )
   }
 
-const bookingDate = new Date(date)
-  const room = prisma.room.findUnique({where: {
-    name: roomName
-  }})
-  if(!room){
-    return NextResponse.json(
-      { success: false, resultCode: 1, message: "Room not found" },
-      { status: 404 }
-    )
-  }
-  const roomId = room.id 
-  const bookeds = prisma.booking.findMany({
-    where: { roomId, date: bookingDate },
-  })
-
-  
-  const bitmap = generateBitmap(schedule[0], schedule[1])
-
-  const conflict = bookeds.some((booking:Booking)=>{
-    return (booking.schedule & bitmap) !== 0
-  })
-  if(conflict){
-    return NextResponse.json(
-      {
-        success: false,
-        resultCode: 4,
-        message: "Room is already booked",
-      },
-      { status: 409 }
-    )
-  }
   try {
+    const bookingDate = new Date(date)
+    const room = await prisma.room.findFirst({
+      where: {
+        name: roomName,
+      },
+    })
+
+    if (!room) {
+      return NextResponse.json(
+        { success: false, resultCode: 1, message: "Room not found" },
+        { status: 404 }
+      )
+    }
+
+    const bookeds = await prisma.booking.findMany({
+      where: {
+        roomId: room.id,
+        date: bookingDate,
+      },
+    })
+
+    const bitmap = generateBitmap(schedule[0], schedule[1])
+
+    const conflict = bookeds.some((booking: Booking) => {
+      return (booking.schedule & bitmap) !== 0
+    })
+
+    if (conflict) {
+      return NextResponse.json(
+        {
+          success: false,
+          resultCode: 4,
+          message: "Room is already booked",
+        },
+        { status: 409 }
+      )
+    }
+
     const booking = await prisma.booking.create({
       data: {
         userId: decoded.id,
-        roomId: roomId, 
+        roomId: room.id,
         date: bookingDate,
         schedule: bitmap,
       },
