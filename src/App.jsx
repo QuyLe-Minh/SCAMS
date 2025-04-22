@@ -23,9 +23,9 @@ function App() {
       <Route
         path="/room-booking"
         element={
-          // <ProtectedRoute>
+          <ProtectedRoute>
             <RoomBooking />
-          // </ProtectedRoute>
+          </ProtectedRoute>
         }
       />
     </Routes>
