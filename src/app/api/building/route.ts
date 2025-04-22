@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth" 
 import { prisma } from "@/config/prisma_client"
+import build from "next/dist/build"
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization")
@@ -34,42 +35,31 @@ export async function GET(req: Request) {
 
  
   const { searchParams } = new URL(req.url)
-  const roomIdParam = searchParams.get("roomId")
-  if (!roomIdParam){
-    return NextResponse.json(
-      {
-        success: false,
-        resultCode: 1,
-        message: "Missing roomId parameter.",
-      },
-      { status: 401 }
-    )
-  }
-  const roomId = parseInt(roomIdParam)
-
+  const paramPageNumber = searchParams.get("pageNumber")
+  const paramPageSize = searchParams.get("pageSize")
+ 
   try {
-    const bookings = await prisma.booking.findMany({
-      where: {
-        roomId: roomId,
-      },
-      select: {
-        id:true,
-        userId:true,
-        date:true,
-        schedule:true
-      },
-      orderBy: [
-        {date: 'asc'},
-    ],
-    })
+    const queryOptions: any = {};
+    if (paramPageNumber && paramPageSize) {
+        const pageNumber = paramPageNumber ? parseInt(paramPageNumber) : -1
+        const pageSize = paramPageSize ? parseInt(paramPageSize) : -1
+        const skip = (pageNumber - 1) * pageSize;
+        queryOptions.skip = skip;
+        queryOptions.take = pageSize;
+    }
+    
+    const buildings = await prisma.building.findMany({
+        ...queryOptions,
+        orderBy: {
+            id: "asc",
+        },
+    });
 
     return NextResponse.json({
       success: true,
       resultCode: 0,
-      message: roomId
-        ? "Room bookings retrieved successfully"
-        : "All bookings retrieved successfully",
-      data: bookings,
+      message: `Retrieved ${buildings.length} building(s) sucessfully.`,
+      data: buildings,
     })
   } catch (error) {
     console.error("Error fetching bookings:", error)
@@ -77,7 +67,7 @@ export async function GET(req: Request) {
       {
         success: false,
         resultCode: 1,
-        message: "Failed to fetch bookings",
+        message: "Failed to fetch buildings",
       },
       { status: 500 }
     )
