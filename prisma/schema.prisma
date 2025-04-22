@@ -29,7 +29,17 @@ model Room {
   description String?
   longitude   Float
   latitude    Float
-  bookings    Booking[] // m-n relation with User through Booking
+  capacity    Int
+  floor       Int
+  buildingId  Int
+  building    Building  @relation(fields: [buildingId], references: [id])
+  bookings    Booking[]
+}
+
+model Building {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  rooms Room[]
 }
 
 model Booking {
