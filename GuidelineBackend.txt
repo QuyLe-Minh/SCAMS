@@ -1,6 +1,6 @@
 **Note: 
-+ API output will always have 3 fields: success, resultCode, message
-+ {baseUrl} can be get using getApiUrl() from src/app/lib/util.
++ API output will always have 3 fields: success: bool, resultCode: number, message: string
++ {baseUrl} can be get using getApiUrl(<apiURL>)(example: getApiUrl("/api/login")) from src/app/lib/util.
 
 enum Role {
   Guest
@@ -79,7 +79,7 @@ Output: {
     message: String, 
 }
 
-List Booking: GET {baseUrl}/api/booking/list_booking?
+List Booking: GET {baseUrl}/api/booking/list_booking
 REQUIRE: Authentication token
 Input:{}
 Output: {
@@ -107,7 +107,24 @@ Output: {
     ]
 }
 
-List room schedule: GET {baseUrl}/api/room/room_schedule
+List buildings: GET {baseUrl}/api/building?pageNumber=<optional>&pageSize=<optional>
+(list all if there is no pageNumber or pageSize)
+REQUIRE: Authentication token
+Input:{}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    data: [
+        {
+            id: number,
+            name: string,
+        }
+    ]
+}
+
+
+List room schedule: GET {baseUrl}/api/room/room_schedule?roomId=<required>
 REQUIRE: Authentication token
 Input:{}
 Output: {

@@ -8,18 +8,33 @@ import { Role } from "@prisma/client";
 export default function Home() {
   useEffect(() => {
     async function Start() {
-      const response = await fetch(getApiUrl("/api/auth/register"), {
+      const response = await fetch(getApiUrl("/api/auth/login"), {
         method: "POST",
         body: JSON.stringify({
-          username: "TestUser",
-          email: "testmail@gmail.com",
-          password: "SecPass",
-          role: Role.Guest,
+          username: "lecturer_user_1",
+          password: "password123",
         }),
       });
 
       const data = await response.json();
-      console.log(data.message);
+      const token = data.token;
+
+      const buildingResponse = await fetch(
+        getApiUrl("/api/building?pageNumber=2&pageSize=5"),
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const buildingData = await buildingResponse.json();
+      console.log(buildingData.data);
+      console.log(buildingData.message);
+
+      await fetch(getApiUrl("/api/auth/logout"), {
+        method: "GET",
+      });
     }
     Start();
   }, []);
