@@ -89,7 +89,7 @@ function Login() {
               <option value="Lecturer">Lecturer</option>
               <option value="Guest">Guest</option>
               <option value="Staff">Staff</option>
-              <option value="Student">Staff</option>
+              <option value="Student">Student</option>
             </select>
           </div>
         )}
