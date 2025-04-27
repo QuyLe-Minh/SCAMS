@@ -37,7 +37,10 @@ function Sidebar() {
             >
               Room Booking
             </li>
-            <li className="p-2 hover:bg-gray-700 cursor-pointer text-center">
+            <li 
+              className="p-2 hover:bg-gray-700 cursor-pointer text-center"
+              onClick = {() => navigate('/map')}  // Navigate to /map
+            >
               Room Navigation
             </li>
             <li className="p-2 hover:bg-gray-700 cursor-pointer text-center">

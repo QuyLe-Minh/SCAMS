@@ -30,7 +30,7 @@ function App() {
         }
       />
       <Route 
-        path = "/room-navigation"
+        path = "/map"
         element = {
           <ProtectedRoute>
             <RoomNavigation />
