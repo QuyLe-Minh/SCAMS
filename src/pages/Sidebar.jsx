@@ -40,7 +40,10 @@ function Sidebar() {
           >
             <FaCalendarAlt /> <span>Room Booking</span>
           </li>
-          <li className="p-2 hover:bg-gray-700 cursor-pointer flex items-center space-x-2">
+          <li 
+              className="p-2 hover:bg-gray-700 cursor-pointer flex items-center space-x-2"
+              onClick = {() => navigate('/map')}  // Navigate to /map
+            >
             <FaMapMarkerAlt /> <span>Room Navigation</span>
           </li>
           <li className="p-2 hover:bg-gray-700 cursor-pointer flex items-center space-x-2">

@@ -5,7 +5,8 @@ import Overview from './pages/Overview';
 import Guest from './pages/Guest';
 import './index.css';
 import RoomBooking from './pages/RoomBooking';
-import ProtectedRoute from './pages/LoginUtils/ProtectedRoute';
+import ProtectedRoute from './pages/LoginUtils/ProtectedRoute'; // Import the ProtectedRoute component
+import RoomNavigation from './pages/RoomNavigation';
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
             <RoomBooking />
           </ProtectedRoute>
         }
+      />
+      <Route 
+        path = "/map"
+        element = {
+          <ProtectedRoute>
+            <RoomNavigation />
+          </ProtectedRoute>
+        } 
       />
     </Routes>
   );
