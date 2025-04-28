@@ -29,7 +29,12 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    return NextResponse.json({ rooms })
+    return NextResponse.json({
+      success: true,
+      resultCode: 0,
+      message: "Room retrieved successfully",
+      data: rooms 
+    })
   } catch (error) {
     console.error(error)
     return NextResponse.json(

@@ -4,7 +4,6 @@ import { prisma } from "@/config/prisma_client"
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization")
-  console.log(authHeader)
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json(
@@ -60,7 +59,13 @@ export async function GET(req: Request) {
 
       if (dateArray.length >= 2) {
         const startDate = new Date(dateArray[0])
+        startDate.setUTCDate(startDate.getDate())
+        startDate.setUTCHours(0, 0, 0, 0)
         const endDate = new Date(dateArray[dateArray.length - 1])
+        endDate.setUTCDate(endDate.getDate())
+        endDate.setUTCHours(23, 59, 59, 0)
+        console.log("Start date:", startDate)
+        console.log("End date:", endDate)
 
    
         whereClause.date = {
@@ -69,8 +74,12 @@ export async function GET(req: Request) {
         }
       }
     } else if (dateParam) {
-   
-      whereClause.date = new Date(dateParam)
+      
+      let dateObj: Date = new Date(dateParam)
+      dateObj.setUTCDate(dateObj.getDate())
+      dateObj.setUTCHours(0, 0,0,0)
+      console.log("Date:", dateObj)
+      whereClause.date = dateObj
     }
 
     const bookings = await prisma.booking.findMany({

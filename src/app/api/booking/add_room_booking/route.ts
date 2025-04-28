@@ -63,7 +63,7 @@ export async function POST(req: Request) {
   }
 
   const bookingDate = new Date(date)
-  bookingDate.setHours(0,0,0,0)
+  bookingDate.setHours(0, 0, 0, 0)
   const room = await prisma.room.findFirst({where: {
     name: roomName
   }})

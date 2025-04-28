@@ -124,7 +124,12 @@ Output: {
 }
 
 
-List room schedule: GET {baseUrl}/api/room/room_schedule?roomId=<required>
+List room schedule: GET {baseUrl}/api/room/room_schedule?roomId=<required>&date=<required>
+(date parameter can be format as following:
+    + <date>: Search for single date 
+    + <start_date>,<end_date>: Search for a range of date from <start_date> to <end_date>
+Advised to use toLocaleDateString() from Date object to make date parameter.
+)
 REQUIRE: Authentication token
 Input:{}
 Output: {
@@ -137,6 +142,27 @@ Output: {
             userId: number,
             date: Date,
             schedule: number
+        }
+    ]
+}
+
+Search room: GET {baseUrl}/api/room/room_search?buildingId=<required>&floor=<required>&capacity=<required>
+REQUIRE: Authentication token
+Input:{}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    data: [
+        {
+            id: number
+            name: string
+            description: string
+            longitude: number (float)
+            latitude: number (float)
+            capacity: number
+            floor: number
+            buildingId: number
         }
     ]
 }
