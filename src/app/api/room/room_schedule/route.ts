@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { verifyToken } from "@/lib/auth"
 import { prisma } from "@/config/prisma_client"
+import { decrypt } from "@/lib/util"
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization")
@@ -64,8 +65,8 @@ export async function GET(req: Request) {
         const endDate = new Date(dateArray[dateArray.length - 1])
         endDate.setUTCDate(endDate.getDate())
         endDate.setUTCHours(23, 59, 59, 0)
-        console.log("Start date:", startDate)
-        console.log("End date:", endDate)
+        // console.log("Start date:", startDate)
+        // console.log("End date:", endDate)
 
    
         whereClause.date = {
@@ -77,8 +78,8 @@ export async function GET(req: Request) {
       
       let dateObj: Date = new Date(dateParam)
       dateObj.setUTCDate(dateObj.getDate())
-      dateObj.setUTCHours(0, 0,0,0)
-      console.log("Date:", dateObj)
+      dateObj.setUTCHours(0, 0, 0, 0)
+      // console.log("Date:", dateObj)
       whereClause.date = dateObj
     }
 
@@ -93,11 +94,13 @@ export async function GET(req: Request) {
       orderBy: [{ date: "asc" }],
     })
 
+    const decryptedBookings = bookings.map((booking) => {return {...booking, schedule: parseInt(decrypt(booking.schedule))}})
+
     return NextResponse.json({
       success: true,
       resultCode: 0,
       message: "Bookings retrieved successfully",
-      data: bookings,
+      data: decryptedBookings,
     })
   } catch (error) {
     console.error("Error fetching bookings:", error)

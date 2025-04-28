@@ -3,6 +3,7 @@ import { getIdFromToken } from "@/lib/auth"
 import { prisma } from "@/config/prisma_client"
 import { Booking } from "@prisma/client/wasm"
 import { isDate } from "util/types"
+import { encrypt, decrypt} from "@/lib/util"
 
 interface BookingRequest {
   roomName: string
@@ -63,7 +64,8 @@ export async function POST(req: Request) {
   }
 
   const bookingDate = new Date(date)
-  bookingDate.setHours(0, 0, 0, 0)
+  bookingDate.setUTCDate(bookingDate.getDate())
+  bookingDate.setUTCHours(0, 0, 0, 0)
   const room = await prisma.room.findFirst({where: {
     name: roomName
   }})
@@ -81,7 +83,7 @@ export async function POST(req: Request) {
   })
 
   const conflict = await bookeds.some((booking:Booking)=>{
-    return (booking.schedule & schedule) != 0
+    return (parseInt(decrypt(booking.schedule)) & schedule) != 0
   })
 
   if(conflict){
@@ -100,7 +102,7 @@ export async function POST(req: Request) {
         userId: userId,
         roomId: roomId, 
         date: bookingDate,
-        schedule: schedule,
+        schedule: encrypt(String(schedule)),
       },
     })
 
