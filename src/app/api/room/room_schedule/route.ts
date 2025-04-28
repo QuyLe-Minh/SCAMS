@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth" 
+import { verifyToken } from "@/lib/auth"
 import { prisma } from "@/config/prisma_client"
+import { decrypt } from "@/lib/util"
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization")
-  console.log(authHeader)
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json(
@@ -16,7 +16,6 @@ export async function GET(req: Request) {
       { status: 401 }
     )
   }
-
 
   const token = authHeader.split(" ")[1]
   const decoded = verifyToken(token)
@@ -32,44 +31,76 @@ export async function GET(req: Request) {
     )
   }
 
- 
   const { searchParams } = new URL(req.url)
   const roomIdParam = searchParams.get("roomId")
-  if (!roomIdParam){
+  const dateParam = searchParams.get("date")
+
+  if (!roomIdParam) {
     return NextResponse.json(
       {
         success: false,
         resultCode: 1,
         message: "Missing roomId parameter.",
       },
-      { status: 401 }
+      { status: 400 } 
     )
   }
+
   const roomId = parseInt(roomIdParam)
 
   try {
+
+    const whereClause: any = {
+      roomId: roomId,
+    }
+
+ 
+    if (dateParam && dateParam.includes(",")) {
+      const dateArray = dateParam.split(",")
+
+      if (dateArray.length >= 2) {
+        const startDate = new Date(dateArray[0])
+        startDate.setUTCDate(startDate.getDate())
+        startDate.setUTCHours(0, 0, 0, 0)
+        const endDate = new Date(dateArray[dateArray.length - 1])
+        endDate.setUTCDate(endDate.getDate())
+        endDate.setUTCHours(23, 59, 59, 0)
+        // console.log("Start date:", startDate)
+        // console.log("End date:", endDate)
+
+   
+        whereClause.date = {
+          gte: startDate,
+          lte: endDate,
+        }
+      }
+    } else if (dateParam) {
+      
+      let dateObj: Date = new Date(dateParam)
+      dateObj.setUTCDate(dateObj.getDate())
+      dateObj.setUTCHours(0, 0, 0, 0)
+      // console.log("Date:", dateObj)
+      whereClause.date = dateObj
+    }
+
     const bookings = await prisma.booking.findMany({
-      where: {
-        roomId: roomId,
-      },
+      where: whereClause,
       select: {
-        id:true,
-        userId:true,
-        date:true,
-        schedule:true
+        id: true,
+        userId: true,
+        date: true,
+        schedule: true,
       },
-      orderBy: [
-        {date: 'asc'},
-    ],
+      orderBy: [{ date: "asc" }],
     })
+
+    const decryptedBookings = bookings.map((booking) => {return {...booking, schedule: parseInt(decrypt(booking.schedule))}})
 
     return NextResponse.json({
       success: true,
       resultCode: 0,
-      message: roomId
-        ? "Room bookings retrieved successfully"
-        : "All bookings retrieved successfully",
-      data: bookings,
+      message: "Bookings retrieved successfully",
+      data: decryptedBookings,
     })
   } catch (error) {
     console.error("Error fetching bookings:", error)

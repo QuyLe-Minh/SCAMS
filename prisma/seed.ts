@@ -2,6 +2,8 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+import { encrypt, decrypt } from "@/lib/util";
+
 import { Role } from "@prisma/client";
 
 async function main() {
@@ -1332,50 +1334,50 @@ async function main() {
 
   const bookings = [{
     date: new Date('2025-04-15T00:00:00Z'),
-    schedule: 1,
+    schedule: encrypt(String(1)),
     userId: lecturer.id,
     roomId: 1, //A4-101
   },{
     date: new Date('2025-04-16T00:00:00Z'),
-    schedule: 158,
+    schedule: encrypt(String(158)),
     userId: lecturer.id,
     roomId: 1, //A4-101
   },{
     date: new Date('2025-04-16T00:00:00Z'),
-    schedule: 2,
+    schedule: encrypt(String(2)),
     userId: lecturer.id,
     roomId: 2, //A4-102
   },{
     date: new Date('2025-04-17T00:00:00Z'),
-    schedule: 4,
+    schedule: encrypt(String(4)),
     userId: lecturer.id,
     roomId: 1, //A4-101
   }
   ,{
     date: new Date('2025-04-17T00:00:00Z'),
-    schedule: 8,
+    schedule: encrypt(String(8)),
     userId: lecturer.id,
     roomId: 2, //A4-102
   },{
     date: new Date('2025-04-18T00:00:00Z'),
-    schedule: 96,
+    schedule: encrypt(String(96)),
     userId: lecturer.id,
     roomId: 1, //A4-101
   }
   ,{
     date: new Date('2025-04-19T00:00:00Z'),
-    schedule: 16,
+    schedule: encrypt(String(16)),
     userId: lecturer.id,
     roomId: 1, //A4-101
   }
   ,{
     date: new Date('2025-04-19T00:00:00Z'),
-    schedule: 24,
+    schedule: encrypt(String(24)),
     userId: lecturer.id,
     roomId: 2, //A4-102
   },{
     date: new Date('2025-04-22T00:00:00Z'),
-    schedule: 100,
+    schedule: encrypt(String(100)),
     userId: lecturer.id,
     roomId: 1, //A4-101
   }

@@ -19,8 +19,53 @@ export default function Home() {
       const data = await response.json();
       const token = data.token;
 
+      // const addBookingDate = new Date(2025, 3, 20);
+      // console.log(addBookingDate.toISOString());
+      // const addBookingResponse = await fetch(
+      //   getApiUrl("/api/booking/add_room_booking"),
+      //   {
+      //     method: "POST",
+      //     body: JSON.stringify({
+      //       roomName: "A4-102",
+      //       date: addBookingDate,
+      //       schedule: 30,
+      //     }),
+      //     headers: {
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //   }
+      // );
+      // const addBookingData = await addBookingResponse.json();
+      // console.log(addBookingData.data);
+      // console.log(addBookingData.message);
+
+      const listBookingResponse = await fetch(
+        getApiUrl("/api/booking/list_booking"),
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const listBookingData = await listBookingResponse.json();
+      console.log(listBookingData.data);
+      console.log(listBookingData.message);
+
+      const bookingDate = new Date(2025, 3, 14);
+      const bookinEndDate = new Date(2025, 3, 21);
+      console.log(
+        bookingDate.toISOString(),
+        "/",
+        bookingDate.toLocaleDateString()
+      );
       const buildingResponse = await fetch(
-        getApiUrl("/api/building?pageNumber=2&pageSize=5"),
+        getApiUrl(
+          "/api/room/room_schedule?roomId=2&date=" +
+            bookingDate.toLocaleDateString() +
+            "," +
+            bookinEndDate.toLocaleDateString()
+        ),
         {
           method: "GET",
           headers: {

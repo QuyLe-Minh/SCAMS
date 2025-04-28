@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 import { verifyToken, getIdFromToken} from '@/lib/auth';
+import { decrypt } from '@/lib/util';
 
 const prisma = new PrismaClient();
 
@@ -31,7 +32,9 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, resultCode: 200, message: 'Booking list retrieved', data: bookings });
+    const decryptedBookings = bookings.map((booking) => {return {...booking, schedule: parseInt(decrypt(booking.schedule))}})
+
+    return NextResponse.json({ success: true, resultCode: 200, message: 'Booking list retrieved', data: decryptedBookings });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ success: false, resultCode: 500, message: 'Server error' }, { status: 500 });

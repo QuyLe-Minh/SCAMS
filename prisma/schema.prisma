@@ -49,7 +49,7 @@ model Booking {
   room        Room     @relation(fields: [roomId], references: [id])
   roomId      Int
   date        DateTime
-  schedule    Int      // Bitmap to represent time slots
+  schedule    String      // Bitmap to represent time slots
 
   @@unique([userId, roomId, date, schedule]) // Optional: prevent duplicate bookings
 }
