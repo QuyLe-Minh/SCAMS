@@ -1,7 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
+import { FaMapMarkerAlt } from "react-icons/fa"; // Import GPS icon
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const AvailableRoomModal = ({ isOpen, onClose, rooms = [] }) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -48,9 +52,24 @@ const AvailableRoomModal = ({ isOpen, onClose, rooms = [] }) => {
                             Capacity: {room.capacity} | Building: {room.building} | Floor: {room.floor}
                           </div>
                         </div>
-                        <button className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 transition">
-                          Book
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {/* Book Button */}
+                          <button className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 transition">
+                            Book
+                          </button>
+                          {/* GPS Icon Button */}
+                          <button
+                            onClick={() =>
+                              navigate(
+                                `/room-navigation?latitude=${room.latitude}&longitude=${room.longitude}`
+                              )
+                            }
+                            className="text-green-600 hover:text-green-700"
+                            title="Navigate to Room"
+                          >
+                            <FaMapMarkerAlt size={20} />
+                          </button>
+                        </div>
                       </li>
                     ))}
                   </ul>
