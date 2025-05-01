@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/config/prisma_client';
 // import bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
 export async function POST(req: NextRequest) {

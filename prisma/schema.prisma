@@ -29,7 +29,17 @@ model Room {
   description String?
   longitude   Float
   latitude    Float
-  bookings    Booking[] // m-n relation with User through Booking
+  capacity    Int
+  floor       Int
+  buildingId  Int
+  building    Building  @relation(fields: [buildingId], references: [id])
+  bookings    Booking[]
+}
+
+model Building {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique
+  rooms Room[]
 }
 
 model Booking {
@@ -39,7 +49,7 @@ model Booking {
   room        Room     @relation(fields: [roomId], references: [id])
   roomId      Int
   date        DateTime
-  schedule    Int      // Bitmap to represent time slots
+  schedule    String      // Bitmap to represent time slots
 
   @@unique([userId, roomId, date, schedule]) // Optional: prevent duplicate bookings
 }

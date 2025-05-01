@@ -1,0 +1,168 @@
+**Note: 
++ API output will always have 3 fields: success: bool, resultCode: number, message: string
++ {baseUrl} can be get using getApiUrl(<apiURL>)(example: getApiUrl("/api/login")) from src/app/lib/util.
+
+enum Role {
+  Guest
+  Student
+  Lecturer
+  Staff
+}
+
+Login: POST {baseUrl}/api/login
+Input:{
+    username: string,
+    password: string,
+}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    username: String,
+    role: Role,
+    token: String //JWT token
+} 
+(Make 6 hours "auth_token" cookies)
+
+Register: POST {baseUrl}/api/register
+Input:{
+    username: String,
+    email: String,
+    password: String,
+    role: String
+}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+}
+
+Logout: GET {baseUrl}/api/logout
+Input:{
+
+}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+} 
+(Remove "auth_token" cookies)
+
+Add Room Booking: POST {baseUrl}/api/booking/add_room_booking
+REQUIRE: Authentication token
+Input:{
+    roomName: string,
+    date: Date,
+    schedule: number,
+}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    data: {
+        id: number
+        userId: number,
+        roomId: number,
+        date: Date,
+        schedule: number, // bitmap
+    },
+}
+
+Delete Booking: DELETE {baseUrl}/api/booking/delete_booking
+REQUIRE: Authentication token
+Input:{
+    bookingId: number;
+}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+}
+
+List Booking: GET {baseUrl}/api/booking/list_booking
+REQUIRE: Authentication token
+Input:{}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    data: [
+        {
+            id: number,
+            userId: number,
+            roomId: number,
+            date: Date,
+            schedule: number.
+            room: {
+                id: number
+                name: String        
+                description: String
+                longitude: number
+                latitude: number
+                capacity: number
+                floor: number
+                buildingId: number
+            }
+        }
+    ]
+}
+
+List buildings: GET {baseUrl}/api/building?pageNumber=<optional>&pageSize=<optional>
+(list all if there is no pageNumber or pageSize)
+REQUIRE: Authentication token
+Input:{}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    data: [
+        {
+            id: number,
+            name: string,
+        }
+    ]
+}
+
+
+List room schedule: GET {baseUrl}/api/room/room_schedule?roomId=<required>&date=<required>
+(date parameter can be format as following:
+    + <date>: Search for single date 
+    + <start_date>,<end_date>: Search for a range of date from <start_date> to <end_date>
+Advised to use toLocaleDateString() from Date object to make date parameter.
+)
+REQUIRE: Authentication token
+Input:{}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    data: [
+        {
+            id: number,
+            userId: number,
+            date: Date,
+            schedule: number
+        }
+    ]
+}
+
+Search room: GET {baseUrl}/api/room/room_search?buildingId=<required>&floor=<required>&capacity=<required>
+REQUIRE: Authentication token
+Input:{}
+Output: {
+    success: bool,
+    resultCode: number, 
+    message: String, 
+    data: [
+        {
+            id: number
+            name: string
+            description: string
+            longitude: number (float)
+            latitude: number (float)
+            capacity: number
+            floor: number
+            buildingId: number
+        }
+    ]
+}
