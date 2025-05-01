@@ -113,7 +113,7 @@ const RoomBooking = () => {
           {/* Capacity Selector using DropdownSelect */}
           <DropdownSelect
             label="Capacity"
-            options={["4", "6", "8", "10"]}
+            options={["10", "20", "50", "100", "all"]}
             selected={capacityFilter === "all" ? "" : capacityFilter}
             onChange={(val) => setCapacityFilter(val)}
           />
