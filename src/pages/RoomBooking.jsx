@@ -37,14 +37,13 @@ const RoomBooking = () => {
 
         const roomsByBuilding = {};
         response_data.forEach((building) => {
-          console.log(building.name, building.rooms);
           roomsByBuilding[building.name] = building.rooms || [];
         });
         setRoomsByBuilding(roomsByBuilding);
-        // Mock floors for each building (replace with actual data if available)
+        // Mock floors for each building
         const floors = {};
         buildingNames.forEach((building) => {
-          floors[building] = ["1", "2", "3", "4", "5"];
+          floors[building] = [1, 2, 3, 4, 5];
         });
         setFloorsByBuilding(floors);
       }
@@ -57,7 +56,7 @@ const RoomBooking = () => {
   const filteredRooms = (roomsByBuilding[selectedBuilding] || []).filter((room) => {
     const matchCapacity =
       capacityFilter === "all" || room.capacity >= parseInt(capacityFilter);
-    const matchFloor = !selectedFloor || room.floor === selectedFloor;
+    const matchFloor = !selectedFloor || room.floor === parseInt(selectedFloor);
     return matchCapacity && matchFloor;
   });
 
