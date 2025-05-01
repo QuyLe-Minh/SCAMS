@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { handleSignOut } from './LoginUtils/Signout'; // Adjust the path as needed
+import { handleSignOut } from '../utils/Signout'; // Adjust the path as needed
 import { FaHome, FaCalendarAlt, FaMapMarkerAlt, FaCogs, FaSignOutAlt } from 'react-icons/fa'; // Import icons
 import { MdDevices, MdContactMail } from 'react-icons/md'; // Additional icons
 

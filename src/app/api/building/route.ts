@@ -1,11 +1,13 @@
-import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth" 
+import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/config/prisma_client"
-import build from "next/dist/build"
+import jwt from 'jsonwebtoken';
 
-export async function GET(req: Request) {
+const COOKIE_NAME = 'auth_token';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization")
-  console.log(authHeader)
+  const token = req.cookies.get(COOKIE_NAME)?.value;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return NextResponse.json(
@@ -17,10 +19,17 @@ export async function GET(req: Request) {
       { status: 401 }
     )
   }
-
-
-  const token = authHeader.split(" ")[1]
-  const decoded = verifyToken(token)
+  if (!token) {
+    return NextResponse.json(
+      {
+        success: false,
+        resultCode: 2,
+        message: "Unauthorized",
+      },
+      { status: 401 }
+    )
+  }
+  const decoded = jwt.verify(token, JWT_SECRET);
 
   if (!decoded) {
     return NextResponse.json(
@@ -53,8 +62,10 @@ export async function GET(req: Request) {
         orderBy: {
             id: "asc",
         },
+        include:{
+          rooms: true,
+        }
     });
-
     return NextResponse.json({
       success: true,
       resultCode: 0,

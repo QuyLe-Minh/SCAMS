@@ -7,7 +7,6 @@ export const handleSignOut = async (navigate) => {
       const data = await response.json();
   
       if (data.success) {
-        alert(data.message); // Optional: Show a success message
         localStorage.setItem('isLoggedIn', 'false');
         navigate('/'); // Redirect to the login page
       } else {

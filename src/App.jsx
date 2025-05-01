@@ -5,7 +5,7 @@ import Overview from './pages/Overview';
 import Guest from './pages/Guest';
 import './index.css';
 import RoomBooking from './pages/RoomBooking';
-import ProtectedRoute from './pages/LoginUtils/ProtectedRoute'; // Import the ProtectedRoute component
+import ProtectedRoute from './utils/ProtectedRoute';
 import RoomNavigation from './pages/RoomNavigation';
 
 function App() {

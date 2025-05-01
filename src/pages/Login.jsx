@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { handleSignup } from './LoginUtils/Signup'; // Adjust the path as needed
-import { handleLogin } from './LoginUtils/Signin'; // Adjust the path as needed
+import { handleSignup } from '../utils/Signup'; // Adjust the path as needed
+import { handleLogin } from '../utils/Signin'; // Adjust the path as needed
 
 function Login() {
   const navigate = useNavigate();

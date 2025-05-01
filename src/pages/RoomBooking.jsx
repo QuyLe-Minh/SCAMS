@@ -1,12 +1,12 @@
-import React, { useState } from "react"; 
-import Sidebar from "./Sidebar"
-import TopRightHeader from "../components/Header/TopRightHeader"
-import StatisticCard from "../components/StatisticCard/StatisticCard"
-import ScheduleColumn from "../components/Schedule/ScheduleColumn"
-import WeekPicker from "../components/WeekPicker/WeekPicker"
-import CapacityFilter from "../components/CapacityFilter/CapacityFilter"
+import React, { useState, useEffect } from "react"; 
+import Sidebar from "./Sidebar";
+import TopRightHeader from "../components/Header/TopRightHeader";
+import StatisticCard from "../components/StatisticCard/StatisticCard";
+import ScheduleColumn from "../components/Schedule/ScheduleColumn";
+import WeekPicker from "../components/WeekPicker/WeekPicker";
 import AvailableRoomModal from "../components/Modal/AvailableRoomModal";
 import DropdownSelect from "../components/DropdownSelect/DropdownSelect";
+import fetchBuildings from "../utils/FetchBuildings";
 
 const days = [
   { label: "Sunday", isWeekend: true },
@@ -23,35 +23,43 @@ const RoomBooking = () => {
   const [capacityFilter, setCapacityFilter] = useState("all");
   const [selectedBuilding, setSelectedBuilding] = useState("");
   const [selectedFloor, setSelectedFloor] = useState("");
+  const [buildings, setBuildings] = useState([]); // State for buildings
+  const [floorsByBuilding, setFloorsByBuilding] = useState({}); // State for floors
+  const [roomsByBuilding, setRoomsByBuilding] = useState({}); // State for rooms
 
-  // ✅ Mock buildings + floors
-  const buildings = ["A4", "B4", "C1"];
-  const floorsByBuilding = {
-    A4: ["1", "2", "3", "4", "5"],
-    B4: ["1", "2", "3", "4", "5"],
-    C1: ["1", "2", "3", "4", "5"],
-  };
+  useEffect(() => {
+    const getBuildings = async () => {
+      const response = await fetchBuildings();
+      if (response?.success) {
+        const response_data = response.data;
+        const buildingNames = response_data.map((building) => building.name);
+        setBuildings(buildingNames);
 
-  // ✅ Mock rooms with building + floor
-  const rooms = [
-    { name: "Room 204A4", capacity: 40, building: "A4", floor: "1" },
-    { name: "Room 404A4", capacity: 60, building: "A4", floor: "2" },
-    { name: "Room 504B4", capacity: 80, building: "B4", floor: "1" },
-    { name: "Room 506C1", capacity: 100, building: "C1", floor: "1" },
-    { name: "Room A5", capacity: 100, building: "A4", floor: "3" },
-  ];  
+        const roomsByBuilding = {};
+        response_data.forEach((building) => {
+          console.log(building.name, building.rooms);
+          roomsByBuilding[building.name] = building.rooms || [];
+        });
+        setRoomsByBuilding(roomsByBuilding);
+        // Mock floors for each building (replace with actual data if available)
+        const floors = {};
+        buildingNames.forEach((building) => {
+          floors[building] = ["1", "2", "3", "4", "5"];
+        });
+        setFloorsByBuilding(floors);
+      }
+    };
 
-  // ✅ Filter by capacity + building + floor
-  const filteredRooms = rooms.filter((room) => {
+    getBuildings();
+  }, []);
+
+  // Filter by capacity + building + floor
+  const filteredRooms = (roomsByBuilding[selectedBuilding] || []).filter((room) => {
     const matchCapacity =
       capacityFilter === "all" || room.capacity >= parseInt(capacityFilter);
-    const matchBuilding =
-      !selectedBuilding || room.building === selectedBuilding;
-    const matchFloor =
-      !selectedFloor || room.floor === selectedFloor;
-    return matchCapacity && matchBuilding && matchFloor;
+    const matchFloor = !selectedFloor || room.floor === selectedFloor;
+    return matchCapacity && matchFloor;
   });
-  
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState([]);
@@ -76,7 +84,7 @@ const RoomBooking = () => {
 
         {/* Filter controls */}
         <div className="grid grid-cols-4 gap-6 px-10 pb-4 z-10 relative flex items-center justify-center">
-        {/* Week Picker */}
+          {/* Week Picker */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">Select Week</label>
             <WeekPicker selectedWeek={selectedWeek} onChange={setSelectedWeek} />
@@ -110,7 +118,6 @@ const RoomBooking = () => {
             onChange={(val) => setCapacityFilter(val)}
           />
         </div>
-
 
         {/* Timetable */}
         <div className="flex-1 max-w-[100%] relative z-0">
