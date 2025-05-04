@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState , useEffect} from "react";
 import Sidebar from "./Sidebar";
 import TopRightHeader from "../components/Header/TopRightHeader";
 import StatisticCard from "../components/StatisticCard/StatisticCard"; 
 import BookingCard from "../components/BookingCard/BookingCard";
+import fetchBookings from "../utils/FetchBooking";
+
+// Mock data
 const bookings = [
   {
     user: "Admin",
@@ -34,7 +37,44 @@ const bookings = [
   },
 ];
 
+
 function Overview() {
+  const [bookings, setBookings] = useState([]);
+
+  useEffect(() => {
+    const getBookings = async () => {
+      const data = await fetchBookings();
+      if (data?.success) {
+        setBookings(data.data); // adjust this depending on your actual API response structure
+      } else {
+        console.error("Failed to fetch bookings");
+      }
+    };
+
+    getBookings();
+  }, []);
+
+  const handleCancelBooking = async (bookingId) => {
+    try {
+      const response = await fetch(`/api/booking/delete_booking`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookingId: bookingId }),
+      });
+  
+      const result = await response.json();
+      if (result.success) {
+        setBookings((prev) => prev.filter((b) => b.id !== bookingId));
+      } else {
+        console.error("Failed to cancel booking:", result.message);
+      }
+    } catch (err) {
+      console.error("Error cancelling booking:", err);
+    }
+  };
+
   return (
     <div className="flex h-screen w-screen bg-[#f9fafb]">
       <Sidebar />
@@ -60,17 +100,46 @@ function Overview() {
 
         {/* Booking list */}
         <div className="flex-1 px-8 pb-6 overflow-y-auto">
-          {bookings.map((b, i) => (
+                {bookings.map((b, i) => {
+          const dateObj = new Date(b.date);
+          const formattedDate = dateObj.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+          const formattedTime = dateObj.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+          return ( 
             <BookingCard
               key={i}
-              user={b.user}
-              updated={b.updated}
-              room={b.room}
-              date={b.date}
-              time={b.time}
+              
+              user={b.user?.name || "Lecturer"}
+              updated={b.updated || "Recently"}
+              room={b.room?.name || "N/A"}
+              date={formattedDate}
+              time={formattedTime}
+              avatar="https://randomuser.me/api/portraits/men/32.jpg"
+              bookingId={b.id}
+              onCancel={handleCancelBooking}
+            />
+          );
+        })}
+                {/* {bookings.map((b, i) => (
+            
+            <BookingCard
+              key={i}
+              user={b.user || "Lecturer"}
+              updated={b.updated || "Recently"}
+              room={b.room.name || "N/A"}
+              date={b.date || ""}
+              time={b.time || ""}
               avatar="https://randomuser.me/api/portraits/men/32.jpg"
             />
-          ))}
+          ))} */}
+          
         </div>
       </div>
     </div>

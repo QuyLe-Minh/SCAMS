@@ -3,14 +3,27 @@ import { PrismaClient } from '@prisma/client';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
+const COOKIE_NAME = 'auth_token';
+
 export async function DELETE(req: NextRequest) {
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ success: false, resultCode: 401, message: 'No token provided' }, { status: 401 });
+    // const authHeader = req.headers.get('authorization');
+    // if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    //   return NextResponse.json({ success: false, resultCode: 401, message: 'No token provided' }, { status: 401 });
+    // }
+
+    const tokenFromCookie = req.cookies.get(COOKIE_NAME)?.value;
+
+    if (!tokenFromCookie) {
+      return NextResponse.json(
+        { success: false, resultCode: 401, message: 'No token provided' },
+        { status: 401 }
+      );
     }
 
-    const token = authHeader.split(' ')[1]; // Bearer Key
+    const token = tokenFromCookie; //authHeader.split(' ')[1]; // Bearer Key
+
+
     let decodedToken: any;
 
     try {

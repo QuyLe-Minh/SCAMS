@@ -2,7 +2,7 @@ import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Avatar from "../Avatar/Avatar";
 
-const BookingCard = ({ user, updated, room, date, time, avatar }) => {
+const BookingCard = ({ user, updated, room, date, time, avatar, bookingId, onCancel}) => {
   return (
     <div className="flex items-center gap-6 border-y-2 border-gray-200 py-4">
       {/* User Info */}
@@ -25,7 +25,10 @@ const BookingCard = ({ user, updated, room, date, time, avatar }) => {
 
       {/* Actions */}
       <div className="flex-1 flex justify-end items-center gap-3">
-        <button className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-full">
+        <button 
+        className="bg-red-500 hover:bg-red-600 text-white text-sm font-medium px-4 py-2 rounded-full"
+        onClick={() => onCancel(bookingId)}
+        >
           CANCEL BOOKING
         </button>
         <button className="text-gray-400 hover:text-gray-600 text-lg mr-4">
