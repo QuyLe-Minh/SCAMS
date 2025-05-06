@@ -1,45 +1,55 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "./Sidebar";
 import TopRightHeader from "../components/Header/TopRightHeader";
 import StatisticCard from "../components/StatisticCard/StatisticCard"; 
 import BookingCard from "../components/BookingCard/BookingCard";
 import fetchBookings from "../utils/FetchBooking";
+import fetchBuildings from "../utils/FetchBuildings";
 
-// Mock data
-const bookings = [
-  {
-    user: "Admin",
-    updated: "1 day ago",
-    room: "B4-401",
-    date: "May 26, 2025",
-    time: "6:30 PM to 8:30 PM",
-  },
-  {
-    user: "Admin",
-    updated: "1 day ago",
-    room: "A4-511",
-    date: "May 26, 2019",
-    time: "8:00 AM to 10:00 AM",
-  },
-  {
-    user: "Admin",
-    updated: "2 day ago",
-    room: "C6-401",
-    date: "May 26, 2019",
-    time: "7:30 PM to 9:30 PM",
-  },
-  {
-    user: "Admin",
-    updated: "3 days ago",
-    room: "B4-302",
-    date: "May 25, 2019",
-    time: "5:00 PM to 7:00 PM",
-  },
+
+const scheduleTimes = [
+  "07:00 AM - 07:50 AM",
+  "08:00 AM - 08:50 AM",
+  "09:00 AM - 09:50 AM",
+  "10:00 AM - 10:50 AM",
+  "11:00 AM - 11:50 AM",
+  "12:00 PM - 12:50 PM",
+  "01:00 PM - 01:50 PM",
+  "02:00 PM - 02:50 PM",
+  "03:00 PM - 03:50 PM",
+  "04:00 PM - 04:50 PM",
+  "05:00 PM - 05:50 PM",
 ];
+
 
 
 function Overview() {
   const [bookings, setBookings] = useState([]);
+  const [roomsByBuilding, setRoomsByBuilding] = useState({});
+
+// Fetch buildings để đếm tổng số phòng
+useEffect(() => {
+  const getBuildings = async () => {
+    const response = await fetchBuildings();
+    if (response?.success) {
+      const buildingData = response.data;
+      const roomsMap = {};
+
+      buildingData.forEach((b) => {
+        roomsMap[b.name] = b.rooms || [];
+      });
+
+      setRoomsByBuilding(roomsMap);
+    }
+  };
+
+  getBuildings();
+}, []);
+
+// Tính tổng số phòng tất cả các tòa
+const totalRooms = useMemo(() => {
+  return Object.values(roomsByBuilding).flat().length;
+}, [roomsByBuilding]);
 
   useEffect(() => {
     const getBookings = async () => {
@@ -89,44 +99,43 @@ function Overview() {
         {/* Stats */}
         <div className="flex gap-40 w-full p-12">
         {[
-          // mock data
-          { label: "Available", value: 60 },
-          { label: "Acquire", value: 20 },
-          { label: "On hold", value: 4 },
+          { label: "Total Rooms", value: totalRooms}, // vẫn để mock hoặc bạn có thể tính sau
+          { label: "Acquire", value: bookings.length }, // Số lượng booking thực tế
+          { label: "On hold", value: 4 }, // vẫn để mock hoặc có status trong booking thì mới làm được
         ].map((item, index) => (
           <StatisticCard key={index} label={item.label} value={item.value} />
         ))}
+
       </div>
 
         {/* Booking list */}
         <div className="flex-1 px-8 pb-6 overflow-y-auto">
-                {bookings.map((b, i) => {
+        {bookings.map((b, i) => {
           const dateObj = new Date(b.date);
           const formattedDate = dateObj.toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
           });
-          const formattedTime = dateObj.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
 
-          return ( 
+          const scheduleIndex = b.schedule ?? 0;
+          const timeRange = scheduleTimes[scheduleIndex] ?? "Unknown time";
+
+          return (
             <BookingCard
               key={i}
-              
               user={b.user?.name || "Lecturer"}
               updated={b.updated || "Recently"}
               room={b.room?.name || "N/A"}
               date={formattedDate}
-              time={formattedTime}
+              time={timeRange}
               avatar="https://randomuser.me/api/portraits/men/32.jpg"
               bookingId={b.id}
               onCancel={handleCancelBooking}
             />
           );
         })}
+
                 {/* {bookings.map((b, i) => (
             
             <BookingCard
