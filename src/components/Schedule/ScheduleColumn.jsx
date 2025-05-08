@@ -2,8 +2,14 @@ import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 
-const ScheduleColumn = ({ day, isWeekend, rooms = [], onRoomClick }) => {
-  // mock: 11 tiết từ 07:00 - 17:00
+const ScheduleColumn = ({
+  day,
+  isWeekend,
+  rooms = [],
+  roomSchedules = {},
+  dayIndex,
+  onRoomClick,
+}) => {
   const periods = [];
   for (let i = 0; i < 11; i++) {
     const hour = 7 + i;
@@ -13,49 +19,51 @@ const ScheduleColumn = ({ day, isWeekend, rooms = [], onRoomClick }) => {
   }
 
   return (
-    <div
-      className={clsx(
-        "w-full border-l border-[#444149] min-w-[150px]",
-        isWeekend ? "bg-[#4a3f4d]" : "bg-[#2f2c35]"
-      )}
-    >
-      {/* Header */}
-      <div className="text-sm font-semibold text-white py-2 text-center border-b border-[#3d3d49] bg-inherit sticky top-0 z-10">
+    <div className={`w-full min-w-[150px] border-l ${isWeekend ? "bg-[#4a3f4d]" : "bg-[#2f2c35]"}`}>
+      <div className="text-white font-semibold text-sm py-2 text-center sticky top-0 bg-inherit z-10">
         {day}
       </div>
+      {periods.map((period, index) => {
+        const availableRooms = rooms.filter((room) => {
+          const daySchedules = roomSchedules[room.id]?.[dayIndex] || [];
+          return !daySchedules.some((s) => s.schedule === index);
+        });
 
-      {/* Each tiết */}
-      {periods.map((period, index) => (
-        <div
-          key={index}
-          className="h-16 text-xs text-white border-b border-[#3d3d49] flex items-center justify-between px-2"
-        >
-          {/* Left: Time range */}
-          <div className="flex flex-col items-center justify-center text-[13px] leading-tight w-1/2 ">
-            <span>{period.start}</span>
-            <span className="-mt-[2px] mb-[2px] font-xs leading-none scale-y-50 text-white">|</span>
-            <span>{period.end}</span>
-          </div>
-
-          {/* Right: Room count */}
-          <div className="flex items-center justify-center w-1/2 border-l border-[#3d3d49]  h-full">
-          <button
-            onClick={() => onRoomClick(index, day)}
-            className="bg-blue-600 text-white text-xs w-7 h-7 rounded-full flex items-center justify-center hover:bg-blue-700 transition"
+        return (
+          <div
+            key={index}
+            className="h-16 text-xs text-white border-b border-[#3d3d49] flex items-center justify-between px-2"
           >
-            {rooms.length}
-          </button>
+            <div className="flex flex-col items-center justify-center text-[13px] w-1/2">
+              <span>{period.start}</span>
+              <span className="-mt-1 mb-1 scale-y-50">|</span>
+              <span>{period.end}</span>
+            </div>
+
+            <div className="flex items-center justify-center w-1/2 border-l border-[#3d3d49] h-full">
+              <button
+                onClick={() => onRoomClick(index, day)}
+                className="bg-blue-600 text-white w-7 h-7 rounded-full hover:bg-blue-700 flex items-center justify-center text-xs"
+              >
+                {availableRooms.length}
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
 
+
 ScheduleColumn.propTypes = {
   day: PropTypes.string.isRequired,
+  dayIndex: PropTypes.number.isRequired, // 👈 Thêm cái này để biết index
+  selectedWeek: PropTypes.instanceOf(Date).isRequired, // 👈 Truyền selectedWeek
   isWeekend: PropTypes.bool,
   rooms: PropTypes.array,
+  roomSchedules: PropTypes.object,
+  onRoomClick: PropTypes.func.isRequired,
 };
 
 export default ScheduleColumn;

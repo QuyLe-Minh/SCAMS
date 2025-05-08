@@ -1,34 +1,30 @@
-import { NextResponse } from "next/server"
-import { verifyToken } from "@/lib/auth"
-import { prisma } from "@/config/prisma_client"
-import { decrypt } from "@/lib/util"
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/config/prisma_client";
+import { verifyToken } from "@/lib/auth";
+import { decrypt } from "@/lib/util";
 
-export async function GET(req: Request) {
-  const authHeader = req.headers.get("authorization")
+export async function GET(req: NextRequest) {
+  const authHeader = req.headers.get("authorization");
+  const cookieToken = req.cookies.get("auth_token")?.value;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json(
-      {
-        success: false,
-        resultCode: 2,
-        message: "Unauthorized",
-      },
-      { status: 401 }
-    )
+  // Ưu tiên lấy token từ cookie nếu có, không thì lấy header
+  const token = cookieToken || (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null);
+
+  if (!token) {
+    return NextResponse.json({
+      success: false,
+      resultCode: 2,
+      message: "Unauthorized",
+    }, { status: 401 });
   }
 
-  const token = authHeader.split(" ")[1]
-  const decoded = verifyToken(token)
-
+  const decoded = verifyToken(token);
   if (!decoded) {
-    return NextResponse.json(
-      {
-        success: false,
-        resultCode: 2,
-        message: "Invalid or expired token",
-      },
-      { status: 401 }
-    )
+    return NextResponse.json({
+      success: false,
+      resultCode: 2,
+      message: "Invalid or expired token",
+    }, { status: 401 });
   }
 
   const { searchParams } = new URL(req.url)

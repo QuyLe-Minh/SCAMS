@@ -23,15 +23,18 @@ function generateBitmap(start: number, end: number): number {
 
 export async function POST(req: Request) {
   const authHeader = req.headers.get("authorization")
+  const cookieToken = req.headers.get("cookie")?.match(/auth_token=([^;]+)/)?.[1]
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  // Ưu tiên lấy cookie token → nếu không có mới lấy header
+  const token = cookieToken || (authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : null)
+
+  if (!token) {
     return NextResponse.json(
       { success: false, resultCode: 2, message: "Unauthorized" },
       { status: 401 }
     )
   }
 
-  const token = authHeader.split(" ")[1]
   const userId = getIdFromToken(token)
 
   if (!userId) {

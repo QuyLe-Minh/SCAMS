@@ -1,10 +1,10 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
-import { FaMapMarkerAlt } from "react-icons/fa"; // Import GPS icon
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { FaMapMarkerAlt } from "react-icons/fa"; // GPS Icon
+import { useNavigate } from "react-router-dom";
 
-const AvailableRoomModal = ({ isOpen, onClose, rooms = [] }) => {
-  const navigate = useNavigate(); // Initialize useNavigate
+const AvailableRoomModal = ({ isOpen, onClose, rooms = [], onBook }) => {
+  const navigate = useNavigate();
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -52,11 +52,16 @@ const AvailableRoomModal = ({ isOpen, onClose, rooms = [] }) => {
                             Capacity: {room.capacity} | Building: {room.building} | Floor: {room.floor}
                           </div>
                         </div>
+
                         <div className="flex items-center gap-2">
                           {/* Book Button */}
-                          <button className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 transition">
+                          <button
+                            onClick={() => onBook(room.name)}
+                            className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700 transition"
+                          >
                             Book
                           </button>
+
                           {/* GPS Icon Button */}
                           <button
                             onClick={() =>
