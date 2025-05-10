@@ -59,6 +59,7 @@ const RoomBooking = () => {
   const [roomsByBuilding, setRoomsByBuilding] = useState({});
   const [roomSchedules, setRoomSchedules] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
+  const [acquireRooms, setAcquireRooms] = useState([]);
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [selectedPeriodIndex, setSelectedPeriodIndex] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -70,7 +71,8 @@ const RoomBooking = () => {
   const fetchAndSetBookings = async () => {
     const data = await fetchBookings();
     if (data?.success) {
-      setBookings(data.data);
+      setBookings(data.data.allBookings);
+      setAcquireRooms(data.data.userBookingsCount);
     } else {
       console.error("Failed to fetch bookings");
     }
@@ -210,7 +212,7 @@ const RoomBooking = () => {
 
         <div className="flex gap-24 p-10">
           <StatisticCard label="Total Rooms" value={filteredRooms.length} />
-          <StatisticCard label="Acquire" value={bookings.length} />
+          <StatisticCard label="Acquire" value={acquireRooms} />
           <StatisticCard label="On hold" value={4} />
         </div>
 

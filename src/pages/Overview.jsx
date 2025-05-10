@@ -26,6 +26,7 @@ const scheduleTimes = [
 function Overview() {
   const [bookings, setBookings] = useState([]);
   const [roomsByBuilding, setRoomsByBuilding] = useState({});
+  const [userBookings, setUserBookings] = useState([]);
 
 // Fetch buildings để đếm tổng số phòng
 useEffect(() => {
@@ -55,7 +56,8 @@ const totalRooms = useMemo(() => {
     const getBookings = async () => {
       const data = await fetchBookings();
       if (data?.success) {
-        setBookings(data.data); // adjust this depending on your actual API response structure
+        setBookings(data.data.allBookings);
+        setUserBookings(data.data.allBookings.filter((b) => b.userId === data.data.userId));
       } else {
         console.error("Failed to fetch bookings");
       }
@@ -100,7 +102,7 @@ const totalRooms = useMemo(() => {
         <div className="flex gap-40 w-full p-12">
         {[
           { label: "Total Rooms", value: totalRooms}, // vẫn để mock hoặc bạn có thể tính sau
-          { label: "Acquire", value: bookings.length }, // Số lượng booking thực tế
+          { label: "Acquire", value: userBookings.length }, // Số lượng booking thực tế
           { label: "On hold", value: 4 }, // vẫn để mock hoặc có status trong booking thì mới làm được
         ].map((item, index) => (
           <StatisticCard key={index} label={item.label} value={item.value} />
@@ -110,7 +112,7 @@ const totalRooms = useMemo(() => {
 
         {/* Booking list */}
         <div className="flex-1 px-8 pb-6 overflow-y-auto">
-        {bookings.map((b, i) => {
+        {userBookings.map((b, i) => {
           const dateObj = new Date(b.date);
           const formattedDate = dateObj.toLocaleDateString("en-US", {
             year: "numeric",
