@@ -93,7 +93,10 @@ function Login() {
             </select>
           </div>
         )}
-        <div className="text-right text-xs text-blue-600 cursor-pointer mb-3">
+        <div
+          className="text-right text-xs text-blue-600 cursor-pointer mb-3"
+          onClick={() => navigate('/guest')}
+        >
           Forgot password?
         </div>
         {!isSigningUp ? (
@@ -129,15 +132,6 @@ function Login() {
             </button>
           </>
         )}
-        <div className="text-center mt-4 text-sm">
-          Or sign in as{' '}
-          <span
-            onClick={() => navigate('/guest')}
-            className="text-blue-600 cursor-pointer"
-          >
-            Guest
-          </span>
-        </div>
       </div>
     </div>
   );
