@@ -36,14 +36,16 @@ const fetchWithAuth = async (url, method = "GET", body = null) => {
     });
 
     const data = await response.json();
+
     if (!response.ok) {
       console.error(`API ${url} error:`, data.message);
-      return null;
+      return { success: false, status: response.status, message: data.message };
     }
-    return data;
+    return data; // Return the successful response data
   } catch (error) {
     console.error(`API ${url} error:`, error);
-    return null;
+    // Return a generic error object
+    return { success: false, status: 500, message: "Internal server error" };
   }
 };
 
@@ -190,6 +192,8 @@ const RoomBooking = () => {
       setTimeout(() => {
         navigate("/overview");
       }, 1500);
+    } else if (result?.status === 403) {
+      toast.error("Unauthorized access: Only lecturers can book rooms.");
     } else {
       toast.error("Booking failed: " + result?.message);
     }

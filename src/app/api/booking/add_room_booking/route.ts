@@ -1,24 +1,15 @@
 import { NextResponse } from "next/server"
-import { getIdFromToken } from "@/lib/auth"
+import { getIdFromToken, getRoleFromToken } from "@/lib/auth"
 import { prisma } from "@/config/prisma_client"
 import { Booking } from "@prisma/client/wasm"
-import { isDate } from "util/types"
 import { encrypt, decrypt} from "@/lib/util"
+import { Role } from "@prisma/client";
+
 
 interface BookingRequest {
   roomName: string
   date: Date
   schedule: number //Bitmap
-}
-
-function generateBitmap(start: number, end: number): number {
-  let bitmap = 0
-  for (let i = 0; i <= end; i++) {
-    if (i >= start){
-      bitmap |= 1 << i
-    }
-  }
-  return bitmap
 }
 
 export async function POST(req: Request) {
@@ -36,11 +27,19 @@ export async function POST(req: Request) {
   }
 
   const userId = getIdFromToken(token)
+  const userRole = getRoleFromToken(token)
 
   if (!userId) {
     return NextResponse.json(
       { success: false, resultCode: 2, message: "Invalid or expired token" },
       { status: 401 }
+    )
+  }
+
+  if (userRole !== Role.Lecturer){
+    return NextResponse.json(
+      { success: false, resultCode: 2, message: "Unauthorized access" },
+      { status: 403 }
     )
   }
 

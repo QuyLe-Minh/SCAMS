@@ -11,16 +11,13 @@ export const handleLogin = async (email, password, setError, triggerBuzzleEffect
     if (data.success || data.resultCode === 4) {
       localStorage.setItem('isLoggedIn', 'true');
       navigate('/overview');
-    } else if (data.resultCode === 5) {
-      setError('Invalid username/email or password');
+    }else {
+      setError(data.message);
       triggerBuzzleEffect();
-    } else {
-      setError(data.message); // Set error message
-      triggerBuzzleEffect(); // Trigger the buzzle effect
     }
   } catch (err) {
     console.error('Login failed:', err);
-    setError('Invalid username/email or password'); // Set generic error message
-    triggerBuzzleEffect(); // Trigger the buzzle effect
+    setError('Invalid username/email or password');
+    triggerBuzzleEffect();
   }
 };
