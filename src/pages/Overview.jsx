@@ -126,7 +126,7 @@ const totalRooms = useMemo(() => {
               key={i}
               user={b.user?.name || "Lecturer"}
               updated={b.updated || "Recently"}
-              room={b.room?.name || "N/A"}
+              room={b.room || "N/A"}
               date={formattedDate}
               time={timeRange}
               avatar="https://randomuser.me/api/portraits/men/32.jpg"
