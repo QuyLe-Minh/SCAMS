@@ -250,7 +250,13 @@ const RoomBooking = () => {
 
         <div className="flex-1 max-w-full relative z-0">
           <div className="flex flex-row overflow-auto">
-            {days.map(({ label, index }) => (
+          {days.map(({ label, index }) => {
+            const weekStart = new Date(selectedWeek);
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const columnDate = new Date(weekStart);
+            columnDate.setDate(weekStart.getDate() + index);
+
+            return (
               <ScheduleColumn
                 key={label}
                 day={label}
@@ -258,6 +264,8 @@ const RoomBooking = () => {
                 rooms={filteredRooms}
                 roomSchedules={roomSchedules}
                 dayIndex={index}
+                columnDate={columnDate}
+                today={new Date()}
                 onRoomClick={(periodIdx, day) => {
                   setSelectedPeriodIndex(periodIdx);
                   setSelectedDay(day);
@@ -265,7 +273,8 @@ const RoomBooking = () => {
                   setModalOpen(true);
                 }}
               />
-            ))}
+            );
+          })}
 
             <AvailableRoomModal
               isOpen={modalOpen}

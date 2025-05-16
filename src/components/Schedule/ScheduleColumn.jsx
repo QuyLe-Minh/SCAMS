@@ -9,6 +9,8 @@ const ScheduleColumn = ({
   roomSchedules = {},
   dayIndex,
   onRoomClick,
+  columnDate,
+  today,
 }) => {
   const periods = [];
   for (let i = 0; i < 11; i++) {
@@ -18,8 +20,16 @@ const ScheduleColumn = ({
     periods.push({ label: `Tiết ${i + 1}`, start, end });
   }
 
+  // 👇 Add this logic
+  const isPast =
+    columnDate &&
+    today &&
+    columnDate.setHours(0, 0, 0, 0) < today.setHours(0, 0, 0, 0);
+
   return (
-    <div className={`w-full min-w-[150px] border-l ${isWeekend ? "bg-[#4a3f4d]" : "bg-[#2f2c35]"}`}>
+    <div
+      className={`w-full min-w-[150px] border-l ${isWeekend ? "bg-[#4a3f4d]" : "bg-[#2f2c35]"} ${isPast ? "opacity-50 pointer-events-none" : ""}`}
+    >
       <div className="text-white font-semibold text-sm py-2 text-center sticky top-0 bg-inherit z-10">
         {day}
       </div>
@@ -64,6 +74,8 @@ ScheduleColumn.propTypes = {
   rooms: PropTypes.array,
   roomSchedules: PropTypes.object,
   onRoomClick: PropTypes.func.isRequired,
+  columnDate: PropTypes.instanceOf(Date),
+  today: PropTypes.instanceOf(Date),
 };
 
 export default ScheduleColumn;
