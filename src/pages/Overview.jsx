@@ -79,6 +79,7 @@ const totalRooms = useMemo(() => {
       const result = await response.json();
       if (result.success) {
         setBookings((prev) => prev.filter((b) => b.id !== bookingId));
+        setUserBookings((prev) => prev.filter((b) => b.id !== bookingId));
       } else {
         console.error("Failed to cancel booking:", result.message);
       }
