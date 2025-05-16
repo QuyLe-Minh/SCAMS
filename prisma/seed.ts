@@ -12,25 +12,25 @@ async function main() {
       {
         username: 'guest_user_1',
         email: 'guest1@example.com',
-        password: 'password123',
+        password: encrypt('password123'),
         role: Role.Guest,
       },
       {
         username: 'student_user_1',
         email: 'student1@example.com',
-        password: 'password123',
+        password:  encrypt('password123'),
         role: Role.Student,
       },
       {
         username: 'student_user_2',
         email: 'student2@example.com',
-        password: 'password123',
+        password: encrypt('password123'),
         role: Role.Student,
       },
       {
         username: 'staff_user_1',
         email: 'staff1@example.com',
-        password: 'password123',
+        password: encrypt('password123'),
         role: Role.Staff,
       },
     ],
@@ -40,7 +40,7 @@ async function main() {
     data:{
       username: 'lecturer_user_1',
       email: 'lecturer1@example.com',
-      password: 'password123',
+      password: encrypt('password123'),
       role: Role.Lecturer,
     }
   })
