@@ -2,6 +2,7 @@ import { prisma } from '@/config/prisma_client';
 // import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
+import { decrypt, encrypt } from '@/lib/util';
 import 'dotenv/config';
 import {
   getEmailFromToken,
@@ -48,7 +49,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
           },
         });
 
-        if (!user || password !== user.password) {
+        if (!user || password !== decrypt(user.password)) {
           return NextResponse.json({
             success: false,
             resultCode: 2,
