@@ -108,7 +108,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       },
     });
 
-    if (!user || password != user.password) {
+    if (!user || password != decrypt(user.password)) {
       return NextResponse.json({ success: false, resultCode: 2, message: 'Invalid username or password' }, { status: 401 });
     }
 
